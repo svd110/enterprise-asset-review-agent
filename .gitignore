@@ -2,3 +2,4 @@
 __pycache__/
 .env
 data/inventory.db
+.DS_Store
