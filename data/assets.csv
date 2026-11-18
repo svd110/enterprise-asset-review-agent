@@ -1,12 +1,12 @@
 asset_id,product_name,version,vendor,asset_type,deployment_model,business_criticality,data_sensitivity,annual_maintenance_cost,end_of_support_date,lifecycle_source_url,lifecycle_checked_date
 A01,Windows Server,2012 R2,Microsoft,operating_system,on_premises,high,restricted,9500,2023-10-10,https://learn.microsoft.com/en-us/lifecycle/products/windows-server-2012-r2,2026-11-17
-A02,Windows Server,2016,Microsoft,operating_system,on_premises,medium,confidential,,2027-01-12,https://learn.microsoft.com/lifecycle/products/windows-server-2016,2026-11-17
-A03,Windows Server,2022,Microsoft,operating_system,on_premises,medium,restricted,12000,2031-10-14,https://learn.microsoft.com/en-us/lifecycle/products/windows-server-2022,2026-11-17
+A02,Windows Server,2016,Microsoft,operating_system,on_premises,high,confidential,,2027-01-12,https://learn.microsoft.com/lifecycle/products/windows-server-2016,2026-11-17
+A03,Windows Server,2022,Microsoft,operating_system,on_premises,high,confidential,12000,2031-10-14,https://learn.microsoft.com/en-us/lifecycle/products/windows-server-2022,2026-11-17
 A04,Red Hat Enterprise Linux,7,Red Hat,operating_system,on_premises,high,restricted,15000,2024-06-30,https://access.redhat.com/articles/7005471,2026-11-17
 A05,Microsoft SQL Server,2014,Microsoft,database,on_premises,high,restricted,28000,2024-07-09,https://learn.microsoft.com/sql/sql-server/end-of-support/extended-security-updates-frequently-asked-questions,2026-11-17
-A06,Microsoft SQL Server,2019,Microsoft,database,on_premises,medium,confidential,22000,2030-01-08,https://learn.microsoft.com/en-us/lifecycle/products/sql-server-2019,2026-11-17
+A06,Microsoft SQL Server,2019,Microsoft,database,on_premises,high,confidential,22000,2030-01-08,https://learn.microsoft.com/en-us/lifecycle/products/sql-server-2019,2026-11-17
 A07,Oracle Database,19c,Oracle,database,on_premises,high,restricted,95000,2029-12-31,https://www.oracle.com/us/support/library/lifetime-support-technology-069183.pdf,2026-11-17
-A08,Amazon RDS for PostgreSQL,15,Amazon Web Services,database,cloud_managed,medium,confidential,18000,2028-02-29,https://docs.aws.amazon.com/AmazonRDS/latest/PostgreSQLReleaseNotes/postgresql-release-calendar.html,2026-11-17
+A08,Amazon RDS for PostgreSQL,15,Amazon Web Services,database,cloud_managed,medium,restricted,18000,2028-02-29,https://docs.aws.amazon.com/AmazonRDS/latest/PostgreSQLReleaseNotes/postgresql-release-calendar.html,2026-11-17
 A09,.NET,8,Microsoft,runtime,on_premises,high,restricted,0,2026-11-10,https://devblogs.microsoft.com/dotnet/dotnet-8-9-end-of-support/,2026-11-17
 A10,Microsoft Exchange Server,2016,Microsoft,application,on_premises,low,confidential,14000,2025-10-14,https://learn.microsoft.com/lifecycle/products/exchange-server-2016,2026-11-17
 A11,Microsoft 365,,Microsoft,application,saas,medium,confidential,180000,,,
