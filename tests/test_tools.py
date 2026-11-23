@@ -1,7 +1,7 @@
 """Tests for the asset review tools."""
 
 from datetime import date
-from src.tools import compute_support_status, get_asset, list_assets
+from src.tools import compute_support_status, get_asset, list_assets, get_dependencies, get_dependents
 
 REVIEW = date(2026, 11, 18)
 
@@ -81,3 +81,27 @@ def test_list_assets_filters_ending_soon():
 
 def test_list_assets_rejects_invalid_status():
     assert list_assets("expired")["error"] == "invalid_support_status"
+
+# ******************************************** Testing get_dependencies and get_dependents ***************************************************
+
+def test_loan_origination_depends_on_three_expired_components():
+    result = get_dependencies("A14")
+    assert [a["asset_id"] for a in result["depends_on"]] == ["A01", "A05", "A09"]
+    assert all(a["support_status"] == "end_of_support" for a in result["depends_on"])
+
+
+def test_windows_2016_hosts_sql_2019_and_exchange():
+    result = get_dependents("A02")
+    assert [a["asset_id"] for a in result["dependents"]] == ["A06", "A10"]
+
+
+def test_nothing_depends_on_exchange():
+    assert get_dependents("A10")["count"] == 0
+
+
+def test_saas_has_no_dependencies():
+    assert get_dependencies("A11")["count"] == 0
+
+
+def test_dependencies_of_unknown_asset_returns_error():
+    assert get_dependencies("A99") == {"error": "asset_not_found", "asset_id": "A99"}

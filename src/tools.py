@@ -92,3 +92,54 @@ def list_assets(support_status=None):
         })
 
     return {"assets": summaries, "count": len(summaries)}
+
+# ***********************************************************************************************
+
+def _summarize(row):
+    """Build the short summary used when listing or linking assets."""
+    return {
+        "asset_id": row["asset_id"],
+        "product_name": row["product_name"],
+        "version": row["version"],
+        "business_criticality": row["business_criticality"],
+        "data_sensitivity": row["data_sensitivity"],
+        "support_status": compute_support_status(
+            row["deployment_model"], row["end_of_support_date"]
+        ),
+    }
+
+
+def _linked_assets(asset_id, join_column, filter_column, result_key):
+    """Shared logic for get_dependencies and get_dependents."""
+    asset_id = asset_id.strip().upper()
+
+    conn = get_connection()
+    try:
+        exists = conn.execute(
+            "SELECT 1 FROM assets WHERE asset_id = ?", (asset_id,)
+        ).fetchone()
+        if exists is None:
+            return {"error": "asset_not_found", "asset_id": asset_id}
+
+        rows = conn.execute(
+            "SELECT a.asset_id, a.product_name, a.version, a.deployment_model, "
+            "a.business_criticality, a.data_sensitivity, a.end_of_support_date "
+            f"FROM dependencies d JOIN assets a ON a.asset_id = d.{join_column} "
+            f"WHERE d.{filter_column} = ? ORDER BY a.asset_id",
+            (asset_id,),
+        ).fetchall()
+    finally:
+        conn.close()
+
+    linked = [_summarize(row) for row in rows]
+    return {"asset_id": asset_id, result_key: linked, "count": len(linked)}
+
+
+def get_dependencies(asset_id):
+    """Return the assets this asset depends on, each with its support status."""
+    return _linked_assets(asset_id, "depends_on_asset_id", "asset_id", "depends_on")
+
+
+def get_dependents(asset_id):
+    """Return the assets that depend on this asset, each with its support status."""
+    return _linked_assets(asset_id, "asset_id", "depends_on_asset_id", "dependents")
