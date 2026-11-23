@@ -1,12 +1,12 @@
 """Tests for the asset review tools."""
 
 from datetime import date
-from src.tools import compute_support_status
-from src.tools import compute_support_status, get_asset
+from src.tools import compute_support_status, get_asset, list_assets
 
 REVIEW = date(2026, 11, 18)
 
 
+# ******************************************* Testing compute_support_status ****************************************************
 def test_saas_is_not_applicable():
     assert compute_support_status("saas", None, REVIEW) == "not_applicable"
 
@@ -38,6 +38,7 @@ def test_day_before_review_is_end_of_support():
 def test_missing_date_on_premises_is_unknown():
     assert compute_support_status("on_premises", None, REVIEW) == "unknown"
 
+# ******************************************** Testing get_asset ***************************************************
 
 def test_get_asset_returns_record_with_status():
     asset = get_asset("A05")
@@ -61,3 +62,22 @@ def test_get_asset_unknown_id_returns_error():
 
 def test_get_asset_accepts_lowercase_id():
     assert get_asset("a05")["asset_id"] == "A05"
+
+# ******************************************** Testing list_asset ***************************************************
+
+def test_list_assets_returns_all_fifteen():
+    assert list_assets()["count"] == 15
+
+
+def test_list_assets_filters_end_of_support():
+    ids = [a["asset_id"] for a in list_assets("end_of_support")["assets"]]
+    assert ids == ["A01", "A04", "A05", "A09", "A10"]
+
+
+def test_list_assets_filters_ending_soon():
+    ids = [a["asset_id"] for a in list_assets("ending_soon")["assets"]]
+    assert ids == ["A02", "A08", "A13"]
+
+
+def test_list_assets_rejects_invalid_status():
+    assert list_assets("expired")["error"] == "invalid_support_status"

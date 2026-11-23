@@ -52,3 +52,43 @@ def get_asset(asset_id):
         asset["end_of_support_date"]
     )
     return asset
+
+# ***********************************************************************************************
+
+VALID_STATUSES = ("supported", "ending_soon", "end_of_support", "not_applicable", "unknown")
+
+
+def list_assets(support_status=None):
+    """Return a short summary of every asset, optionally filtered by support status."""
+    if support_status is not None and support_status not in VALID_STATUSES:
+        return {
+            "error": "invalid_support_status",
+            "support_status": support_status,
+            "valid_values": list(VALID_STATUSES),
+        }
+
+    conn = get_connection()
+    try:
+        rows = conn.execute(
+            "SELECT asset_id, product_name, version, deployment_model, "
+            "business_criticality, data_sensitivity, end_of_support_date "
+            "FROM assets ORDER BY asset_id"
+        ).fetchall()
+    finally:
+        conn.close()
+
+    summaries = []
+    for row in rows:
+        status = compute_support_status(row["deployment_model"], row["end_of_support_date"])
+        if support_status is not None and status != support_status:
+            continue
+        summaries.append({
+            "asset_id": row["asset_id"],
+            "product_name": row["product_name"],
+            "version": row["version"],
+            "business_criticality": row["business_criticality"],
+            "data_sensitivity": row["data_sensitivity"],
+            "support_status": status,
+        })
+
+    return {"assets": summaries, "count": len(summaries)}
