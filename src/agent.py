@@ -6,6 +6,7 @@ import sys
 
 from dotenv import load_dotenv
 from openai import OpenAI
+from src.validation import ASSET_ID, validate_answer
 
 from src.tools import (
     VALID_STATUSES,
@@ -150,6 +151,7 @@ def run_agent(question):
     """Answer one question, letting the model choose which tools to call."""
     print(f"\nQUESTION: {question}\nMODEL: {MODEL}\n")
     conversation: list = [{"role": "user", "content": question}]
+    retrieved_ids = set()
 
     for step in range(1, MAX_STEPS + 1):
         response = client.responses.create(
@@ -163,14 +165,21 @@ def run_agent(question):
 
         if not tool_calls:
             print(f"FINAL ANSWER (after {step - 1} tool steps):\n")
-            print(response.output_text)
-            return response.output_text
+            answer = response.output_text
+            print(answer)
+    
+            checks = validate_answer(answer, retrieved_ids)
+            print("\nVALIDATION")
+            for name, passed, detail in checks:
+                print(f"  {'PASS' if passed else 'FAIL'}  {name} ({detail})")
+            return answer, checks
 
         conversation += response.output
 
         for call in tool_calls:
             print(f"STEP {step}: model chose {call.name}({call.arguments})")
             result = run_tool(call.name, call.arguments)
+            retrieved_ids |= set(ASSET_ID.findall(json.dumps(result)))
             preview = json.dumps(result)
             print(f"  RESULT: {preview[:150]}{'...' if len(preview) > 150 else ''}\n")
             conversation.append({
@@ -180,7 +189,7 @@ def run_agent(question):
             })
 
     print("STOPPED: step limit reached without a final answer.")
-    return None
+    return None, []
 
 
 if __name__ == "__main__":
