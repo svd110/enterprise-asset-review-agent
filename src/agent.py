@@ -113,8 +113,11 @@ For each asset you assess, propose one of:
 Rules:
 - Cite asset IDs (for example A05) for every claim.
 - To find an asset by name, call list_assets once with no filter.
-- Check dependencies when they could change the answer, such as for in-house applications, which have no vendor support date, or infrastructure that other systems run on.
-- If information you need is missing, say exactly what is missing and recommend investigate rather than guessing.
+- Check dependencies when they could change the answer, such as for in-house applications, 
+    which have no vendor support date, or infrastructure that other systems run on.
+- If information you need is missing, say exactly what is missing and recommend investigate rather than guessing. 
+    In particular, if an asset is ending_soon or end_of_support and its annual maintenance cost is not recorded, 
+    recommend investigate, because the cost of extended support versus migration cannot be compared.
 - If a tool returns an error, report it plainly. Do not invent results.
 - Your recommendations are proposals for human review, not decisions. Do not repeat this in your answer.
 

@@ -1,0 +1,123 @@
+======================================================================
+CASE: Needs attention
+
+QUESTION: Should Kosha Bank be concerned about the loan origination system?
+MODEL: gpt-6-luna
+
+STEP 1: model chose list_assets({"support_status":"supported"})
+  RESULT: {"assets": [{"asset_id": "A03", "product_name": "Windows Server", "version": "2022", "business_criticality": "high", "data_sensitivity": "confidential...
+
+STEP 2: model chose list_assets({"support_status":"ending_soon"})
+  RESULT: {"assets": [{"asset_id": "A02", "product_name": "Windows Server", "version": "2016", "business_criticality": "high", "data_sensitivity": "confidential...
+
+STEP 2: model chose list_assets({"support_status":"end_of_support"})
+  RESULT: {"assets": [{"asset_id": "A01", "product_name": "Windows Server", "version": "2012 R2", "business_criticality": "high", "data_sensitivity": "restricte...
+
+STEP 2: model chose list_assets({"support_status":"not_applicable"})
+  RESULT: {"assets": [{"asset_id": "A11", "product_name": "Microsoft 365", "version": null, "business_criticality": "medium", "data_sensitivity": "confidential"...
+
+STEP 3: model chose get_asset({"asset_id":"A14"})
+  RESULT: {"asset_id": "A14", "product_name": "Kosha Loan Origination", "version": "3.2", "vendor": "Kosha Bank (in-house)", "asset_type": "application", "deplo...
+
+STEP 3: model chose get_dependencies({"asset_id":"A14"})
+  RESULT: {"asset_id": "A14", "depends_on": [{"asset_id": "A01", "product_name": "Windows Server", "version": "2012 R2", "business_criticality": "high", "data_s...
+
+FINAL ANSWER (after 3 tool steps):
+
+A14 Kosha Loan Origination: investigate
+Why: This high-criticality, restricted-data application is in-house, so it has no vendor support lifecycle; its dependencies include three end-of-support assets.
+Evidence: A14 depends on A01 Windows Server 2012 R2, A05 Microsoft SQL Server 2014, and A09 .NET 8; each is end_of_support.
+Next step: Review the application’s compatibility and remediation plan for these dependencies.
+
+VALIDATION
+  PASS  cited assets were retrieved (4 cited, all retrieved)
+  PASS  dates match the database (0 dates checked)
+======================================================================
+CASE: No immediate action
+
+QUESTION: Does Windows Server 2022 (A03) need any action right now?
+MODEL: gpt-6-luna
+
+STEP 1: model chose get_asset({"asset_id":"A03"})
+  RESULT: {"asset_id": "A03", "product_name": "Windows Server", "version": "2022", "vendor": "Microsoft", "asset_type": "operating_system", "deployment_model": ...
+
+STEP 2: model chose get_dependents({"asset_id":"A03"})
+  RESULT: {"asset_id": "A03", "dependents": [{"asset_id": "A13", "product_name": "SAP ERP", "version": "6.0 EHP8", "business_criticality": "high", "data_sensiti...
+
+FINAL ANSWER (after 2 tool steps):
+
+A03 Windows Server 2022: maintain
+Why: A03 is supported, with support ending in 2031, so no immediate action is needed.
+Evidence: A03 support status supported; end of support 2031-10-14; annual maintenance cost $12,000. A13 SAP ERP depends on A03 and is ending_soon.
+Next step: Continue routine support for A03 and review whether A13’s upcoming support change affects its compatibility or plans.
+
+VALIDATION
+  PASS  cited assets were retrieved (2 cited, all retrieved)
+  PASS  dates match the database (1 dates checked)
+======================================================================
+CASE: Missing information
+
+QUESTION: Review Windows Server 2016 (A02). Should it be maintained, replaced, or investigated?
+MODEL: gpt-6-luna
+
+STEP 1: model chose get_asset({"asset_id":"A02"})
+  RESULT: {"asset_id": "A02", "product_name": "Windows Server", "version": "2016", "vendor": "Microsoft", "asset_type": "operating_system", "deployment_model": ...
+
+STEP 2: model chose get_dependents({"asset_id":"A02"})
+  RESULT: {"asset_id": "A02", "dependents": [{"asset_id": "A06", "product_name": "Microsoft SQL Server", "version": "2019", "business_criticality": "high", "dat...
+
+FINAL ANSWER (after 2 tool steps):
+
+A02 Windows Server 2016: investigate
+Why: Support ends 2027-01-12, in 55 days, but annual maintenance cost is not recorded, so extended support and migration costs cannot be compared. A02 supports A06 and A10, including A10, which is already end of support.
+Evidence: A02 end of support 2027-01-12; annual maintenance cost null; dependents A06 and A10.
+Next step: Record the maintenance cost and assess the migration or support plan alongside the dependent systems.
+
+VALIDATION
+  PASS  cited assets were retrieved (3 cited, all retrieved)
+  PASS  dates match the database (1 dates checked)
+======================================================================
+CASE: Invalid request
+
+QUESTION: Review asset A99.
+MODEL: gpt-6-luna
+
+STEP 1: model chose get_asset({"asset_id":"A99"})
+  RESULT: {"error": "asset_not_found", "asset_id": "A99"}
+
+FINAL ANSWER (after 1 tool steps):
+
+A99: investigate
+Why: The asset ID was not found, so I can’t verify its name, support status, or other details.
+Evidence: A99 lookup returned “asset_not_found”.
+Next step: Confirm the asset ID and request a review again.
+
+VALIDATION
+  PASS  cited assets were retrieved (1 cited, all retrieved)
+  PASS  dates match the database (0 dates checked)
+======================================================================
+CASE: Tool failure (database missing)
+
+QUESTION: Which assets need review?
+MODEL: gpt-6-luna
+
+STEP 1: model chose list_assets({"support_status":"ending_soon"})
+  RESULT: {"error": "tool_failed", "tool": "list_assets", "detail": "Database not found at /Users/swatisahai/Documents/Northeastern Arlington/Fall 2026/CSYE 737...
+
+STEP 2: model chose list_assets({"support_status":"end_of_support"})
+  RESULT: {"error": "tool_failed", "tool": "list_assets", "detail": "Database not found at /Users/swatisahai/Documents/Northeastern Arlington/Fall 2026/CSYE 737...
+
+FINAL ANSWER (after 2 tool steps):
+
+Unable to identify which assets need review: the inventory database is unavailable. The asset lookup failed with “Database not found”; no asset records were returned.
+
+VALIDATION
+  PASS  cited assets were retrieved (0 cited, all retrieved)
+  PASS  dates match the database (0 dates checked)
+======================================================================
+SUMMARY
+  PASS  expected behavior | PASS  grounding | Needs attention
+  PASS  expected behavior | PASS  grounding | No immediate action
+  PASS  expected behavior | PASS  grounding | Missing information
+  PASS  expected behavior | PASS  grounding | Invalid request
+  PASS  expected behavior | PASS  grounding | Tool failure (database missing)
